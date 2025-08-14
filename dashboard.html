@@ -5,24 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
      <link rel="stylesheet" href="forgotten.css">
+     <link rel="stylesheet" href="fontawesome-free-7.0.0-web/css/all.css">
     <title>Yachad Developer Dashboard</title>
 </head>
+<style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .sidebar {
+      height: 100vh;
+      background-color: #343a40;
+      color: white;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 12px 20px;
+    }
+    .sidebar a:hover {
+      background-color: #495057;
+    }
+    .dashboard-header {
+      padding: 20px;
+    }
+  </style>
 <body>
-    <nav class="navbar navbar-expand-lg bg-warning px-4">
-    <a class="navbar-brand fw-bold" href="#">🎗️Yachad</a>
-    <div class="ms-auto">
-      <a class="btn btn-outline-dark" href="register.html">Register Developer</a>
+    <div class="container-fluid">
+  <div class="row">
+    <!-- //Sidebar  -->
+    <div class="col-md-2 sidebar d-flex flex-column">
+      <div>
+       <h4 class="text-center my-4"><i class="fa fa-code"></i> 🎗️Yachad</h4>
+       <a href="#"><i class="fa fa-user"></i> My Profile</a>
+       <a href="#"><i class="fa fa-users"></i> Developers</a>
+       <a href="#"><i class="fa fa-folder"></i> My Projects</a>
+       <a href="#"><i class="fa fa-search"></i> Explore Projects</a>
+       <a href="#"><i class="fa fa-bell"></i> Notifications</a>
+      </div>
+       <!-- // My Profile -->
+    <div class="profile-icon">
+      <a href="#" title="My Profile"><i class="fa fa-user-circle"></i></a>
     </div>
-  </nav>
-  <div class="container mt-5">
+    </div>
+   
+
+    <!-- // Main Content -->
+    <div class="col-md-10">
+      <div class="dashboard-header bg-white shadow-sm">
+        <h2>Welcome, Veronique!</h2>
+        <p class="text-muted">Here is your overview.</p>
+      </div>
+
+      <div class="row m-3">
+        <!-- //Profile Summary  -->
+        <!-- <div class="col-md-4 mb-3">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Your Profile</h5>
+              <p><strong>Email:</strong> vero@yachad.com</p>
+              <p><strong>Rating:</strong>  <span class="text-warning">
+                ★★★★☆ (4.0)
+              </span></p>
+              <p><strong>Projects:</strong> 5</p>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- //Project List  -->
+        <div class="col-md-8 mb-3">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">My Projects</h5>
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                  Inventory System <span class="badge bg-success">Active</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  Chat App <span class="badge bg-warning text-dark">Pending</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- //Developer Ratings  -->
+       <div class="container mt-5">
     <h2 class="mb-4 text-center">Developer List</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4">
-      <!-- Developer Card Example -->
+      <!-- //Developer Card Example  -->
       <div class="col">
         <div class="card h-100 shadow">
           <div class="card-body">
             <h5 class="card-title">Jane Doe</h5>
-            <p class="card-text"><strong>Skills:</strong> React, Node.js</p>
+            <p class="card-text"><strong>Skills:</strong> React, Node.js,
+            ,Laravel</p>
             <p><strong>Rating:</strong> 
               <span class="text-warning">
                 ★★★★☆ (4.0)
@@ -34,9 +111,30 @@
           </div>
         </div>
       </div>
-      <!-- Repeat similar cards for other developers -->
+      <!-- // Repeat similar cards for other developers --> 
+       <div class="col">
+        <div class="card h-100 shadow">
+          <div class="card-body">
+            <h5 class="card-title">John Smith</h5>
+            <p class="card-text"><strong>Skills:</strong> React, Node.js,Javascript</p>
+            <p><strong>Rating:</strong> 
+              <span class="text-warning">
+                ★★★☆ (3.0)
+              </span>
+            </p>
+          </div>
+          <div class="card-footer text-end">
+            <button class="btn btn-success">Select Developer</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
+      </div>
+    </div>
+  </div>
+</div>
     
 </body>
 </html>
