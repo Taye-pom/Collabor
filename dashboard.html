@@ -12,6 +12,14 @@
     body {
       background-color: #f8f9fa;
     }
+    @media(max-width:768px){
+      .sidebar{
+        width:70px;
+      }
+      .vero-content{
+        margin-left:70px;
+      }
+    }
     .sidebar {
       height: 100vh;
       background-color: #343a40;
@@ -23,9 +31,9 @@
       display: block;
       padding: 12px 20px;
     }
-    .sidebar a:hover {
+    /* .sidebar a:hover {
       background-color: #495057;
-    }
+    } */
     .dashboard-header {
       padding: 20px;
     }
@@ -37,21 +45,28 @@
     <div class="col-md-2 sidebar d-flex flex-column">
       <div>
        <h4 class="text-center my-4"><i class="fa fa-code"></i> 🎗️Yachad</h4>
-       <a href="#"><i class="fa fa-user"></i> My Profile</a>
+       <!-- <ul class=" nav nav-pills flex-column mb-auto">
+         <li class="nav-item" data-bs-toggler="tooltip" data-bs-placement="right" tittle="My Profile">
+          <a href="#" class="nav-link d-flex align-items-center"><i class="fa fa-users"></i></a>
+          <span class="link-text d-none d-md-inline"></span>
+        </li>
+       </ul>  -->
+      
+       <!-- <a href="#" class="nav-link d-flex align-items-center"><i class="fa fa-user" me-2></i> My Profile</a>
        <a href="#"><i class="fa fa-users"></i> Developers</a>
        <a href="#"><i class="fa fa-folder"></i> My Projects</a>
        <a href="#"><i class="fa fa-search"></i> Explore Projects</a>
-       <a href="#"><i class="fa fa-bell"></i> Notifications</a>
+       <a href="#"><i class="fa fa-bell"></i> Notifications</a> -->
       </div>
        <!-- // My Profile -->
-    <div class="profile-icon">
+    <!-- <div class="profile-icon">
       <a href="#" title="My Profile"><i class="fa fa-user-circle"></i></a>
-    </div>
+    </div> -->
     </div>
    
 
     <!-- // Main Content -->
-    <div class="col-md-10">
+    <div class=" vero-content col-md-10">
       <div class="dashboard-header bg-white shadow-sm">
         <h2>Welcome, Veronique!</h2>
         <p class="text-muted">Here is your overview.</p>
