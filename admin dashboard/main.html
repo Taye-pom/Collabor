@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="fontawesome-free-7.0.0-web/css/all.css">
+    <title>Admin Dashboard - DevCollab</title>
+</head>
+<body>
+     <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #3f51b5;
+            --accent-color: #ff5722;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+            --danger-color: #f44336;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, #283593 100%);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-weight: 600;
+            color: white;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stats-card.primary { border-left-color: var(--primary-color); }
+        .stats-card.success { border-left-color: var(--success-color); }
+        .stats-card.warning { border-left-color: var(--warning-color); }
+        .stats-card.info { border-left-color: var(--info-color); }
+        .stats-card.danger { border-left-color: var(--danger-color); }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .project-status-active { border-top-color: var(--success-color); }
+        .project-status-pending { border-top-color: var(--warning-color); }
+        .project-status-completed { border-top-color: var(--info-color); }
+        .project-status-overdue { border-top-color: var(--danger-color); }
+
+        .developer-row {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .developer-row:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .developer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .online-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            border: 2px solid white;
+        }
+
+        .status-online { background-color: var(--success-color); }
+        .status-away { background-color: var(--warning-color); }
+        .status-offline { background-color: #6c757d; }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .notification-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--info-color);
+        }
+
+        .progress-ring {
+            width: 80px;
+            height: 80px;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .table-modern {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .table-modern th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table-modern td {
+            padding: 1rem;
+            border: none;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+
+        .calendar-widget {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .calendar-day.today {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quick-stat {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-crown me-2"></i>Admin Panel</h3>
+            <small class="text-muted">DevCollab Management</small>
+        </div>
+        <ul class="nav nav-pills flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#projects">
+                    <i class="fas fa-project-diagram"></i>Manage Projects
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#tasks">
+                    <i class="fas fa-tasks"></i>Manage Tasks
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#developers">
+                    <i class="fas fa-users"></i>Manage Developers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#progress">
+                    <i class="fas fa-chart-line"></i>Monitor Progress
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#reports">
+                    <i class="fas fa-file-alt"></i>Generate Reports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#communication">
+                    <i class="fas fa-comments"></i>Communication
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#notifications">
+                    <i class="fas fa-bell"></i>Send Notifications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#feedback">
+                    <i class="fas fa-star"></i>View Feedback
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#roles">
+                    <i class="fas fa-user-tag"></i>Attribute Roles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#settings">
+                    <i class="fas fa-cog"></i>System Settings
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link text-danger" href="#logout">
+                    <i class="fas fa-sign-out-alt"></i>Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-toggle me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0">Admin Dashboard</h4>
+                <span class="badge bg-success ms-3">System Online</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell me-1"></i>
+                        <span class="badge bg-danger">8</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Project deadline approaching</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus text-success me-2"></i>New developer registered</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-bug text-danger me-2"></i>Critical bug reported</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center" href="#">View All Notifications</a></li>
+                    </ul>
+                </div>
+                <div class="user-avatar">AD</div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Key Metrics -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card primary">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-muted mb-1">Total Projects</h6>
+                                <h2 class="mb-0">24</h2>
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <div class="text-success">18</div>
+                                        <small>Active</small>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="text-warning">4</div>
+                                        <small>Pending</small>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="text-danger">2</div>
+                                        <small>Overdue</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-primary">
+                                <i class="fas fa-project-diagram fa-3x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card success">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-muted mb-1">Active Developers</h6>
+                                <h2 class="mb-0">48</h2>
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <div class="text-success">42</div>
+                                        <small>Online</small>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="text-warning">4</div>
+                                        <small>Away</small>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="text-muted">2</div>
+                                        <small>Offline</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-success">
+                                <i class="fas fa-users fa-3x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card warning">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-muted mb-1">Total Tasks</h6>
+                                <h2 class="mb-0">156</h2>
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <div class="text-primary">89</div>
+                                        <small>Active</small>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="text-success">67</div>
+                                        <small>Done</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-warning">
+                                <i class="fas fa-tasks fa-3x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card info">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-muted mb-1">System Health</h6>
+                                <h2 class="mb-0">98%</h2>
+                                <div class="quick-stats">
+                                    <div class="quick-stat">
+                                        <div class="text-success">24h</div>
+                                        <small>Uptime</small>
+                                    </div>
+                                    <div class="quick-stat">
+                                        <div class="text-info">2.3s</div>
+                                        <small>Avg Response</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-info">
+                                <i class="fas fa-heartbeat fa-3x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Project Management -->
+                <div class="col-lg-8 mb-4">
+                    <div class="chart-container">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-project-diagram me-2"></i>Project Overview</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newProjectModal">
+                                    <i class="fas fa-plus me-1"></i>New Project
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-filter me-1"></i>Filter
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="project-card project-status-active">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="mb-1">E-Commerce Platform Redesign</h6>
+                                    <p class="text-muted mb-2">Complete overhaul of the existing e-commerce platform with modern UI/UX</p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-3">
+                                            <small class="text-muted">Progress:</small>
+                                            <div class="progress" style="width: 200px; height: 6px;">
+                                                <div class="progress-bar bg-success" style="width: 75%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-success">75% Complete</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-users me-1"></i>8 Developers
+                                        </small>
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-calendar me-1"></i>Due: Dec 15, 2024
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-tasks me-1"></i>12/16 Tasks
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-primary btn-sm">View</button>
+                                        <button class="btn btn-outline-secondary btn-sm">Edit</button>
+                                        <button class="btn btn-outline-danger btn-sm">Archive</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-card project-status-pending">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="mb-1">Mobile App Development</h6>
+                                    <p class="text-muted mb-2">Cross-platform mobile application using React Native</p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-3">
+                                            <small class="text-muted">Progress:</small>
+                                            <div class="progress" style="width: 200px; height: 6px;">
+                                                <div class="progress-bar bg-warning" style="width: 45%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-warning">45% Complete</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-users me-1"></i>5 Developers
+                                        </small>
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-calendar me-1"></i>Due: Jan 30, 2025
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-tasks me-1"></i>8/18 Tasks
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-primary btn-sm">View</button>
+                                        <button class="btn btn-outline-secondary btn-sm">Edit</button>
+                                        <button class="btn btn-outline-danger btn-sm">Archive</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-card project-status-overdue">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="mb-1">API Integration Project</h6>
+                                    <p class="text-muted mb-2">Integrating third-party APIs for enhanced functionality</p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-3">
+                                            <small class="text-muted">Progress:</small>
+                                            <div class="progress" style="width: 200px; height: 6px;">
+                                                <div class="progress-bar bg-danger" style="width: 25%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-danger">Overdue</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-users me-1"></i>3 Developers
+                                        </small>
+                                        <small class="text-danger me-3">
+                                            <i class="fas fa-calendar me-1"></i>Was due: Nov 20, 2024
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-tasks me-1"></i>3/12 Tasks
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-primary btn-sm">View</button>
+                                        <button class="btn btn-outline-secondary btn-sm">Edit</button>
+                                        <button class="btn btn-outline-danger btn-sm">Archive</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions & Calendar -->
+                <div class="col-lg-4 mb-4">
+                    <div class="chart-container mb-3">
+                        <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#newProjectModal">
+                                <i class="fas fa-plus me-2"></i>Create Project
+                            </button>
+                            <button class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addDeveloperModal">
+                                <i class="fas fa-user-plus me-2"></i>Add Developer
+                            </button>
+                            <button class="btn btn-info action-btn">
+                                <i class="fas fa-chart-bar me-2"></i>Generate Report
+                            </button>
+                            <button class="btn btn-warning action-btn">
+                                <i class="fas fa-paper-plane me-2"></i>Send Notification
+                            </button>
+                            <button class="btn btn-outline-secondary action-btn">
+                                <i class="fas fa-cog me-2"></i>System Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-widget">
+                        <h5 class="mb-3"><i class="fas fa-calendar me-2"></i>Calendar</h5>
+                        <div class="text-center mb-3">
+                            <h6>December 2024</h6>
+                        </div>
+                        <div class="row text-center mb-2">
+                            <div class="col"><small class="text-muted">Sun</small></div>
+                            <div class="col"><small class="text-muted">Mon</small></div>
+                            <div class="col"><small class="text-muted">Tue</small></div>
+                            <div class="col"><small class="text-muted">Wed</small></div>
+                            <div class="col"><small class="text-muted">Thu</small></div>
+                            <div class="col"><small class="text-muted">Fri</small></div>
+                            <div class="col"><small class="text-muted">Sat</small></div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col"><div class="calendar-day">15</div></div>
+                            <div class="col"><div class="calendar-day">16</div></div>
+                            <div class="col"><div class="calendar-day">17</div></div>
+                            <div class="col"><div class="calendar-day">18</div></div>
+                            <div class="col"><div class="calendar-day">19</div></div>
+                            <div class="col"><div class="calendar-day">20</div></div>
+                            <div class="col"><div class="calendar-day">21</div></div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col"><div class="calendar-day">22</div></div>
+                            <div class="col"><div class="calendar-day">23</div></div>
+                            <div class="col"><div class="calendar-day">24</div></div>
+                            <div class="col"><div class="calendar-day today">25</div></div>
+                            <div class="col"><div class="calendar-day">26</div></div>
+                            <div class="col"><div class="calendar-day">27</div></div>
+                            <div class="col"><div class="calendar-day">28</div></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><div class="calendar-day">29</div></div>
+                            <div class="col"><div class="calendar-day">30</div></div>
+                            <div class="col"><div class="calendar-day">31</div></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Developer Management & Recent Activity -->
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="table-modern">
+                        <div class="d-flex justify-content-between align-items-center p-3">
+                            <h5 class="mb-0 text-white"><i class="fas fa-users me-2"></i>Developer Management</h5>
+                            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addDeveloperModal">
+                                <i class="fas fa-user-plus me-1"></i>Add Developer
+                            </button>
+                        </div>
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Developer</th>
+                                    <th>Role</th>
+                                    <th>Projects</th>
+                                    <th>Tasks</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                <div class="developer-avatar" style="background-color: #e74c3c;">AJ</div>
+                                                <div class="online-status status-online"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Alice Johnson</h6>
+                                                <small class="text-muted">alice.johnson@devcollab.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">Full-Stack</span>
+                                    </td>
+                                    <td>3 Active</td>
+                                    <td>12 Assigned</td>
+                                    <td><span class="badge bg-success">Online</span></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning" title="Message">
+                                                <i class="fas fa-message"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                <div class="developer-avatar" style="background-color: #3498db;">BS</div>
+                                                <div class="online-status status-online"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Bob Smith</h6>
+                                                <small class="text-muted">bob.smith@devcollab.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">Backend</span>
+                                    </td>
+                                    <td>2 Active</td>
+                                    <td>8 Assigned</td>
+                                    <td><span class="badge bg-success">Online</span></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning" title="Message">
+                                                <i class="fas fa-message"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                <div class="developer-avatar" style="background-color: #9b59b6;">CD</div>
+                                                <div class="online-status status-away"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Carol Davis</h6>
+                                                <small class="text-muted">carol.davis@devcollab.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">UI/UX Designer</span>
+                                    </td>
+                                    <td>4 Active</td>
+                                    <td>6 Assigned</td>
+                                    <td><span class="badge bg-warning">Away</span></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning" title="Message">
+                                                <i class="fas fa-message"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                <div class="developer-avatar" style="background-color: #e67e22;">DW</div>
+                                                <div class="online-status status-online"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">David Wilson</h6>
+                                                <small class="text-muted">david.wilson@devcollab.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">Mobile Dev</span>
+                                    </td>
+                                    <td>1 Active</td>
+                                    <td>15 Assigned</td>
+                                    <td><span class="badge bg-success">Online</span></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning" title="Message">
+                                                <i class="fas fa-message"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                <div class="developer-avatar" style="background-color: #f39c12;">EB</div>
+                                                <div class="online-status status-offline"></div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Emma Brown</h6>
+                                                <small class="text-muted">emma.brown@devcollab.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">DevOps</span>
+                                    </td>
+                                    <td>2 Active</td>
+                                    <td>4 Assigned</td>
+                                    <td><span class="badge bg-secondary">Offline</span></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="View Profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning" title="Message">
+                                                <i class="fas fa-message"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Notifications -->
+                <div class="col-lg-4 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-3"><i class="fas fa-bell me-2"></i>Recent Activity</h5>
+                        <div class="notification-card">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-user-plus text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">New Developer Joined</h6>
+                                    <p class="text-muted mb-1">Sarah Connor joined the Mobile Development team</p>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-card">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Project Deadline Alert</h6>
+                                    <p class="text-muted mb-1">E-Commerce Platform due in 3 days</p>
+                                    <small class="text-muted">4 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-card">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Task Completed</h6>
+                                    <p class="text-muted mb-1">Authentication module testing completed by Alice</p>
+                                    <small class="text-muted">6 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-card">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-bug text-danger"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Critical Bug Reported</h6>
+                                    <p class="text-muted mb-1">Payment gateway integration issue found</p>
+                                    <small class="text-muted">8 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-card">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">Feedback Received</h6>
+                                    <p class="text-muted mb-1">Client provided 5-star rating for mobile app</p>
+                                    <small class="text-muted">1 day ago</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm">View All Activities</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Analytics -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <h5 class="mb-4"><i class="fas fa-chart-line me-2"></i>Team Performance Analytics</h5>
+                        <div class="row">
+                            <div class="col-md-3 text-center">
+                                <div class="progress-ring mx-auto mb-3">
+                                    <svg width="80" height="80">
+                                        <circle cx="40" cy="40" r="32" stroke="#e9ecef" stroke-width="6"></circle>
+                                        <circle cx="40" cy="40" r="32" stroke="#28a745" stroke-width="6" 
+                                                stroke-dasharray="201" stroke-dashoffset="50"></circle>
+                                    </svg>
+                                    <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                        <h5 class="text-success mb-0">75%</h5>
+                                    </div>
+                                </div>
+                                <h6>Project Completion</h6>
+                                <small class="text-muted">18 of 24 projects completed</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="progress-ring mx-auto mb-3">
+                                    <svg width="80" height="80">
+                                        <circle cx="40" cy="40" r="32" stroke="#e9ecef" stroke-width="6"></circle>
+                                        <circle cx="40" cy="40" r="32" stroke="#ffc107" stroke-width="6" 
+                                                stroke-dasharray="201" stroke-dashoffset="77"></circle>
+                                    </svg>
+                                    <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                        <h5 class="text-warning mb-0">62%</h5>
+                                    </div>
+                                </div>
+                                <h6>Task Efficiency</h6>
+                                <small class="text-muted">156 tasks, 97 completed</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="progress-ring mx-auto mb-3">
+                                    <svg width="80" height="80">
+                                        <circle cx="40" cy="40" r="32" stroke="#e9ecef" stroke-width="6"></circle>
+                                        <circle cx="40" cy="40" r="32" stroke="#007bff" stroke-width="6" 
+                                                stroke-dasharray="201" stroke-dashoffset="20"></circle>
+                                    </svg>
+                                    <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                        <h5 class="text-info mb-0">90%</h5>
+                                    </div>
+                                </div>
+                                <h6>Team Activity</h6>
+                                <small class="text-muted">43 of 48 developers active</small>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="progress-ring mx-auto mb-3">
+                                    <svg width="80" height="80">
+                                        <circle cx="40" cy="40" r="32" stroke="#e9ecef" stroke-width="6"></circle>
+                                        <circle cx="40" cy="40" r="32" stroke="#dc3545" stroke-width="6" 
+                                                stroke-dasharray="201" stroke-dashoffset="4"></circle>
+                                    </svg>
+                                    <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                        <h5 class="text-danger mb-0">98%</h5>
+                                    </div>
+                                </div>
+                                <h6>System Health</h6>
+                                <small class="text-muted">All systems operational</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal fade" id="newProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Create New Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" class="form-control" placeholder="Enter project name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Project Manager</label>
+                                <select class="form-select">
+                                    <option>Select Project Manager</option>
+                                    <option>John Doe</option>
+                                    <option>Jane Smith</option>
+                                    <option>Mike Johnson</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="3" placeholder="Project description"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select">
+                                    <option>Low</option>
+                                    <option>Medium</option>
+                                    <option>High</option>
+                                    <option>Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Budget</label>
+                                <input type="number" class="form-control" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assign Developers</label>
+                            <select class="form-select" multiple>
+                                <option>Alice Johnson - Full Stack</option>
+                                <option>Bob Smith - Backend</option>
+                                <option>Carol Davis - UI/UX</option>
+                                <option>David Wilson - Mobile</option>
+                                <option>Emma Brown - DevOps</option>
+                            </select>
+                            <small class="text-muted">Hold Ctrl to select multiple developers</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Developer Modal -->
+    <div class="modal fade" id="addDeveloperModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add New Developer</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" placeholder="First name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" placeholder="Last name">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" placeholder="developer@devcollab.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select">
+                                <option>Full-Stack Developer</option>
+                                <option>Frontend Developer</option>
+                                <option>Backend Developer</option>
+                                <option>Mobile Developer</option>
+                                <option>UI/UX Designer</option>
+                                <option>DevOps Engineer</option>
+                                <option>QA Engineer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Skills</label>
+                            <input type="text" class="form-control" placeholder="React, Node.js, Python, etc.">
+                            <small class="text-muted">Separate skills with commas</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Experience Level</label>
+                                <select class="form-select">
+                                    <option>Junior (0-2 years)</option>
+                                    <option>Mid-level (2-5 years)</option>
+                                    <option>Senior (5+ years)</option>
+                                    <option>Lead (8+ years)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Hourly Rate</label>
+                                <input type="number" class="form-control" placeholder="0.00">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success">Add Developer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
