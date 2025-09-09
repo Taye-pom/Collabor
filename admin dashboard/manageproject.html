@@ -3,9 +3,1267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="fontawesome-free-7.0.0-web/css/all.css">
+    <title>Manage Projects - DevCollab Admin</title>
 </head>
 <body>
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #3f51b5;
+            --accent-color: #ff5722;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+            --danger-color: #f44336;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, #283593 100%);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stats-card.success { border-left-color: var(--success-color); }
+        .stats-card.warning { border-left-color: var(--warning-color); }
+        .stats-card.danger { border-left-color: var(--danger-color); }
+        .stats-card.info { border-left-color: var(--info-color); }
+
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.1));
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .project-status-active { border-top-color: var(--success-color); }
+        .project-status-pending { border-top-color: var(--warning-color); }
+        .project-status-completed { border-top-color: var(--info-color); }
+        .project-status-overdue { border-top-color: var(--danger-color); }
+        .project-status-paused { border-top-color: #6c757d; }
+
+        .project-progress {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f0f0f0;
+            margin: 1rem 0;
+        }
+
+        .progress-bar-custom {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .team-avatars {
+            display: flex;
+            align-items: center;
+            gap: -5px;
+        }
+
+        .team-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-left: -5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .team-more {
+            background: #6c757d;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            margin-left: -5px;
+        }
+
+        .filter-tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .filter-tab {
+            border: none;
+            background: transparent;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #f8f9fa;
+        }
+
+        .search-filters {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .milestone-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .milestone-completed { background-color: var(--success-color); }
+        .milestone-current { background-color: var(--warning-color); }
+        .milestone-upcoming { background-color: #dee2e6; }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .priority-critical { background-color: #ffebee; color: #c62828; }
+        .priority-high { background-color: #fff3e0; color: #ef6c00; }
+        .priority-medium { background-color: #fff8e1; color: #f57f17; }
+        .priority-low { background-color: #e8f5e8; color: #2e7d32; }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .table-modern th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table-modern td {
+            padding: 1rem;
+            border: none;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .project-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -1.7rem;
+            top: 1rem;
+            width: 2px;
+            height: calc(100% - 0.5rem);
+            background: #dee2e6;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+
+            .team-avatars {
+                flex-wrap: wrap;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-crown me-2"></i>Admin Panel</h3>
+            <small class="text-muted">DevCollab Management</small>
+        </div>
+        <ul class="nav nav-pills flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link" href="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#projects">
+                    <i class="fas fa-project-diagram"></i>Manage Projects
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#tasks">
+                    <i class="fas fa-tasks"></i>Manage Tasks
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#developers">
+                    <i class="fas fa-users"></i>Manage Developers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#progress">
+                    <i class="fas fa-chart-line"></i>Monitor Progress
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#reports">
+                    <i class="fas fa-file-alt"></i>Generate Reports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#communication">
+                    <i class="fas fa-comments"></i>Communication
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#notifications">
+                    <i class="fas fa-bell"></i>Send Notifications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#feedback">
+                    <i class="fas fa-star"></i>View Feedback
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#roles">
+                    <i class="fas fa-user-tag"></i>Attribute Roles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#settings">
+                    <i class="fas fa-cog"></i>System Settings
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link text-danger" href="#logout">
+                    <i class="fas fa-sign-out-alt"></i>Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-toggle me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0">Manage Projects</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell me-1"></i>
+                        <span class="badge bg-danger">3</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Project deadline approaching</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-bug text-danger me-2"></i>Critical bug reported</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-check-circle text-success me-2"></i>Milestone completed</a></li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar" style="width: 45px; height: 45px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">AD</div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h2 class="mb-2"><i class="fas fa-project-diagram me-3"></i>Project Management</h2>
+                        <p class="mb-0 opacity-75">Manage all development projects, track progress, and coordinate team efforts</p>
+                    </div>
+                    <div class="col-lg-4 text-end">
+                        <button class="btn btn-light btn-lg me-2" data-bs-toggle="modal" data-bs-target="#newProjectModal">
+                            <i class="fas fa-plus me-2"></i>New Project
+                        </button>
+                        <button class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#importProjectModal">
+                            <i class="fas fa-upload me-2"></i>Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Statistics -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card success">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Active Projects</h6>
+                                <h2 class="mb-0 text-success">18</h2>
+                                <small class="text-success">+3 this month</small>
+                            </div>
+                            <div class="text-success">
+                                <i class="fas fa-play-circle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card warning">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Pending Review</h6>
+                                <h2 class="mb-0 text-warning">4</h2>
+                                <small class="text-muted">Awaiting approval</small>
+                            </div>
+                            <div class="text-warning">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card danger">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Overdue</h6>
+                                <h2 class="mb-0 text-danger">2</h2>
+                                <small class="text-danger">Immediate attention</small>
+                            </div>
+                            <div class="text-danger">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Completed</h6>
+                                <h2 class="mb-0 text-info">47</h2>
+                                <small class="text-success">+12 this quarter</small>
+                            </div>
+                            <div class="text-info">
+                                <i class="fas fa-check-circle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="filter-tab active" onclick="filterProjects('all')">
+                            All Projects (24)
+                        </button>
+                        <button class="filter-tab" onclick="filterProjects('active')">
+                            Active (18)
+                        </button>
+                        <button class="filter-tab" onclick="filterProjects('pending')">
+                            Pending (4)
+                        </button>
+                        <button class="filter-tab" onclick="filterProjects('overdue')">
+                            Overdue (2)
+                        </button>
+                        <button class="filter-tab" onclick="filterProjects('completed')">
+                            Completed (47)
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="collapse" data-bs-target="#searchFilters">
+                            <i class="fas fa-filter me-1"></i>Advanced Filters
+                        </button>
+                        <div class="dropdown d-inline">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-sort me-1"></i>Sort By
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="sortProjects('name')">Name</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="sortProjects('date')">Date Created</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="sortProjects('deadline')">Deadline</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="sortProjects('progress')">Progress</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="sortProjects('priority')">Priority</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Search Filters -->
+            <div class="collapse" id="searchFilters">
+                <div class="search-filters">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Search Projects</label>
+                            <input type="text" class="form-control" placeholder="Search by name or description" id="searchInput">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="overdue">Overdue</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" id="priorityFilter">
+                                <option value="">All Priorities</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Date Range</label>
+                            <input type="date" class="form-control" id="dateFrom">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <input type="date" class="form-control" id="dateTo">
+                        </div>
+                        <div class="col-md-1 mb-3 d-flex align-items-end">
+                            <button class="btn btn-primary" onclick="applyFilters()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects List -->
+            <div id="projectsList">
+                <!-- Active Project Card -->
+                <div class="project-card project-status-active" data-status="active" data-priority="high">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="mb-1">E-Commerce Platform Redesign</h4>
+                                    <span class="priority-badge priority-high">High Priority</span>
+                                    <span class="badge bg-success ms-2">Active</span>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#projectDetailsModal"><i class="fas fa-eye me-2"></i>View Details</a></li>
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editProjectModal"><i class="fas fa-edit me-2"></i>Edit Project</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-users me-2"></i>Manage Team</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-tasks me-2"></i>View Tasks</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-pause me-2"></i>Pause Project</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-archive me-2"></i>Archive</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted mb-3">Complete overhaul of the existing e-commerce platform with modern UI/UX design, improved performance, and enhanced security features. Integration with new payment gateways and mobile optimization.</p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Project Manager</small>
+                                    <strong>John Smith</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Start Date</small>
+                                    <strong>Oct 1, 2024</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">End Date</small>
+                                    <strong class="text-warning">Dec 15, 2024</strong>
+                                </div>
+                            </div>
+
+                            <div class="project-progress">
+                                <div class="progress-bar-custom bg-success" style="width: 75%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-success fw-bold">75% Complete</span>
+                                <small class="text-muted">12 of 16 tasks completed</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="team-avatars">
+                                    <div class="team-avatar" style="background-color: #e74c3c;" title="Alice Johnson">AJ</div>
+                                    <div class="team-avatar" style="background-color: #3498db;" title="Bob Smith">BS</div>
+                                    <div class="team-avatar" style="background-color: #9b59b6;" title="Carol Davis">CD</div>
+                                    <div class="team-avatar" style="background-color: #e67e22;" title="David Wilson">DW</div>
+                                    <div class="team-more">+4</div>
+                                </div>
+                                <div class="text-muted">
+                                    <small><i class="fas fa-dollar-sign me-1"></i>Budget: $25,000</small>
+                                    <span class="mx-2">•</span>
+                                    <small><i class="fas fa-calendar me-1"></i>25 days left</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="project-timeline">
+                                <h6 class="mb-3">Project Milestones</h6>
+                                <div class="timeline-item">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="milestone-indicator milestone-current"></span>
+                                        <strong>Development Phase</strong>
+                                    </div>
+                                    <small class="text-warning">In Progress - Due Nov 30, 2024</small>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="milestone-indicator milestone-upcoming"></span>
+                                        <strong>Testing & QA</strong>
+                                    </div>
+                                    <small class="text-muted">Scheduled Dec 5, 2024</small>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="milestone-indicator milestone-upcoming"></span>
+                                        <strong>Deployment</strong>
+                                    </div>
+                                    <small class="text-muted">Scheduled Dec 15, 2024</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Project Card -->
+                <div class="project-card project-status-pending" data-status="pending" data-priority="medium">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="mb-1">Mobile App Development</h4>
+                                    <span class="priority-badge priority-medium">Medium Priority</span>
+                                    <span class="badge bg-warning ms-2">Pending Approval</span>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-check me-2"></i>Approve Project</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit Proposal</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-times me-2"></i>Reject</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted mb-3">Cross-platform mobile application using React Native framework. Features include user authentication, real-time notifications, and offline functionality.</p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Proposed by</small>
+                                    <strong>Sarah Connor</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Submitted</small>
+                                    <strong>Nov 20, 2024</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Est. Duration</small>
+                                    <strong>4 months</strong>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-info me-2">Awaiting Resources</span>
+                                    <small class="text-muted">5 developers requested</small>
+                                </div>
+                                <div class="text-muted">
+                                    <small><i class="fas fa-dollar-sign me-1"></i>Budget: $40,000</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <h6 class="mb-3">Required Resources</h6>
+                            <div class="mb-2">
+                                <small class="text-muted d-block">Mobile Developers</small>
+                                <strong>3 developers needed</strong>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted d-block">UI/UX Designer</small>
+                                <strong>1 designer needed</strong>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted d-block">QA Engineer</small>
+                                <strong>1 tester needed</strong>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-success btn-sm me-2">
+                                    <i class="fas fa-check me-1"></i>Approve
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Review
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Project Card -->
+                <div class="project-card project-status-overdue" data-status="overdue" data-priority="critical">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="mb-1">API Integration Project</h4>
+                                    <span class="priority-badge priority-critical">Critical</span>
+                                    <span class="badge bg-danger ms-2">Overdue</span>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle me-2"></i>Escalate Issue</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-calendar me-2"></i>Extend Deadline</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-users me-2"></i>Reassign Team</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-pause me-2"></i>Suspend Project</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted mb-3">Integration of third-party payment APIs and customer management systems. Critical for production launch. <span class="text-danger fw-bold">Blocking other projects.</span></p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Project Manager</small>
+                                    <strong>Michael Brown</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Was Due</small>
+                                    <strong class="text-danger">Nov 20, 2024</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Days Overdue</small>
+                                    <strong class="text-danger">5 days</strong>
+                                </div>
+                            </div>
+
+                            <div class="project-progress">
+                                <div class="progress-bar-custom bg-danger" style="width: 25%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-danger fw-bold">25% Complete</span>
+                                <small class="text-muted">3 of 12 tasks completed</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="team-avatars">
+                                    <div class="team-avatar" style="background-color: #e74c3c;" title="Tom Wilson">TW</div>
+                                    <div class="team-avatar" style="background-color: #16a085;" title="Lisa Garcia">LG</div>
+                                    <div class="team-avatar" style="background-color: #f39c12;" title="Mark Davis">MD</div>
+                                </div>
+                                <div class="text-muted">
+                                    <small><i class="fas fa-exclamation-triangle text-danger me-1"></i>Urgent action required</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="alert alert-danger">
+                                <h6 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Issues Identified</h6>
+                                <ul class="mb-0 ps-3">
+                                    <li>API documentation incomplete</li>
+                                    <li>Authentication issues</li>
+                                    <li>Resource conflicts</li>
+                                </ul>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-danger btn-sm me-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Escalate
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-calendar me-1"></i>Reschedule
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed Project Card -->
+                <div class="project-card project-status-completed" data-status="completed" data-priority="high">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="mb-1">Customer Portal Enhancement</h4>
+                                    <span class="priority-badge priority-high">High Priority</span>
+                                    <span class="badge bg-success ms-2">Completed</span>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-star me-2"></i>View Feedback</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-chart-bar me-2"></i>Project Report</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-copy me-2"></i>Clone Project</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-archive me-2"></i>Archive</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted mb-3">Enhanced customer portal with new dashboard, improved navigation, and real-time analytics. Successfully deployed and receiving positive user feedback.</p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Project Manager</small>
+                                    <strong>Jennifer Lee</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Completed</small>
+                                    <strong class="text-success">Nov 15, 2024</strong>
+                                </div>
+                                <div class="col-sm-3">
+                                    <small class="text-muted d-block">Duration</small>
+                                    <strong>6 weeks</strong>
+                                </div>
+                            </div>
+
+                            <div class="project-progress">
+                                <div class="progress-bar-custom bg-success" style="width: 100%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-success fw-bold">100% Complete</span>
+                                <small class="text-success">All 14 tasks completed</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-success me-2">4.8★ Rating</span>
+                                    <small class="text-muted">Client satisfaction: Excellent</small>
+                                </div>
+                                <div class="text-muted">
+                                    <small><i class="fas fa-check-circle text-success me-1"></i>On time & budget</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <h6 class="mb-3">Project Metrics</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <h4 class="text-success mb-0">98%</h4>
+                                        <small class="text-muted">Quality Score</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <h4 class="text-success mb-0">$18K</h4>
+                                        <small class="text-muted">Final Cost</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-outline-success btn-sm me-2">
+                                    <i class="fas fa-chart-bar me-1"></i>View Report
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-copy me-1"></i>Clone
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <span class="text-muted">Showing 4 of 24 projects</span>
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal fade" id="newProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Create New Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label class="form-label">Project Name *</label>
+                                        <input type="text" class="form-control" placeholder="Enter project name" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Project Code</label>
+                                        <input type="text" class="form-control" placeholder="AUTO" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Project Description *</label>
+                                    <textarea class="form-control" rows="4" placeholder="Describe the project objectives, scope, and key deliverables" required></textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Project Manager *</label>
+                                        <select class="form-select" required>
+                                            <option value="">Select Project Manager</option>
+                                            <option value="john-smith">John Smith</option>
+                                            <option value="jane-doe">Jane Doe</option>
+                                            <option value="mike-johnson">Mike Johnson</option>
+                                            <option value="sarah-connor">Sarah Connor</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Priority *</label>
+                                        <select class="form-select" required>
+                                            <option value="">Select Priority</option>
+                                            <option value="low">Low</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="high">High</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Project Type</label>
+                                        <select class="form-select">
+                                            <option value="web">Web Development</option>
+                                            <option value="mobile">Mobile App</option>
+                                            <option value="api">API Integration</option>
+                                            <option value="maintenance">Maintenance</option>
+                                            <option value="research">Research & Development</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Start Date *</label>
+                                        <input type="date" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">End Date *</label>
+                                        <input type="date" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Budget ($)</label>
+                                        <input type="number" class="form-control" placeholder="0.00" step="0.01">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Assign Team Members</label>
+                                    <select class="form-select" multiple size="6">
+                                        <optgroup label="Frontend Developers">
+                                            <option value="alice-johnson">Alice Johnson - React Specialist</option>
+                                            <option value="bob-smith">Bob Smith - Vue.js Expert</option>
+                                        </optgroup>
+                                        <optgroup label="Backend Developers">
+                                            <option value="carol-davis">Carol Davis - Node.js Developer</option>
+                                            <option value="david-wilson">David Wilson - Python Developer</option>
+                                        </optgroup>
+                                        <optgroup label="Designers">
+                                            <option value="emma-brown">Emma Brown - UI/UX Designer</option>
+                                            <option value="frank-miller">Frank Miller - Graphic Designer</option>
+                                        </optgroup>
+                                        <optgroup label="QA Engineers">
+                                            <option value="grace-lee">Grace Lee - Test Automation</option>
+                                            <option value="henry-clark">Henry Clark - Manual Testing</option>
+                                        </optgroup>
+                                    </select>
+                                    <small class="text-muted">Hold Ctrl to select multiple team members</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Project Tags</label>
+                                    <input type="text" class="form-control" placeholder="e.g., React, Node.js, MongoDB, API">
+                                    <small class="text-muted">Separate tags with commas</small>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Project Template</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Use Template</label>
+                                        <select class="form-select" onchange="loadTemplate(this.value)">
+                                            <option value="">Create from scratch</option>
+                                            <option value="web-app">Web Application</option>
+                                            <option value="mobile-app">Mobile App</option>
+                                            <option value="api-project">API Development</option>
+                                            <option value="maintenance">Maintenance Project</option>
+                                        </select>
+                                    </div>
+                                    <small class="text-muted">Templates include pre-defined tasks, milestones, and team structure.</small>
+                                </div>
+                            </div>
+
+                            <div class="card bg-light mt-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Project Milestones</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Milestone name">
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="date" class="form-control form-control-sm">
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addMilestone()">
+                                        <i class="fas fa-plus me-1"></i>Add Milestone
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-primary">Save as Draft</button>
+                    <button type="button" class="btn btn-primary">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Details Modal -->
+    <div class="modal fade" id="projectDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Project Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h4>E-Commerce Platform Redesign</h4>
+                            <p class="text-muted">Complete overhaul of the existing e-commerce platform with modern UI/UX design, improved performance, and enhanced security features.</p>
+                            
+                            <h6 class="mt-4 mb-3">Project Timeline</h6>
+                            <div class="table-container">
+                                <table class="table table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th>Phase</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Requirements Analysis</td>
+                                            <td>Oct 1, 2024</td>
+                                            <td>Oct 15, 2024</td>
+                                            <td><span class="badge bg-success">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>UI/UX Design</td>
+                                            <td>Oct 16, 2024</td>
+                                            <td>Nov 5, 2024</td>
+                                            <td><span class="badge bg-success">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Development</td>
+                                            <td>Nov 6, 2024</td>
+                                            <td>Nov 30, 2024</td>
+                                            <td><span class="badge bg-warning">In Progress</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Testing & QA</td>
+                                            <td>Dec 1, 2024</td>
+                                            <td>Dec 10, 2024</td>
+                                            <td><span class="badge bg-secondary">Pending</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Project Info</h6>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Status</small><br>
+                                        <span class="badge bg-success">Active</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Priority</small><br>
+                                        <span class="badge bg-warning">High</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Budget</small><br>
+                                        <strong>$25,000</strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Progress</small><br>
+                                        <strong>75% Complete</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Edit Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Project Modal -->
+    <div class="modal fade" id="importProjectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-upload me-2"></i>Import Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <div class="border rounded p-4 mb-3" style="border-style: dashed !important;">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <p>Drop your project file here or click to browse</p>
+                            <input type="file" class="form-control" accept=".xlsx,.csv,.json">
+                        </div>
+                        <p class="text-muted">Supported formats: Excel (.xlsx), CSV (.csv), JSON (.json)</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Import Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     
 </body>
 </html>
